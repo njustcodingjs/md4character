@@ -1,0 +1,87 @@
+LAMMPS (8 Jun 2016-ICMS)
+WARNING: OMP_NUM_THREADS environment is not set. (../comm.cpp:90)
+  using 1 OpenMP thread(s) per MPI task
+# simulation of LAMMPS logo
+
+units		lj
+atom_style	atomic
+dimension	2
+
+# create 2d lattice, low density so diffuses
+pair_style	lj/cut 2.5
+read_data  lmp.data
+  orthogonal box = (0 0 -1) to (21 105 1)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  2099 atoms
+
+
+
+# LJ and other system parameters
+
+mass		* 1.0
+
+pair_coeff	* * 1.5 1.0 2.5
+
+timestep        0.005
+neighbor	0.3 bin
+neigh_modify	delay 0 every 1 check yes
+
+velocity	all create 7.0 87287 loop geom
+
+
+
+# run without integrator to "pause" the visualization
+thermo		1000
+dump		1 all atom 100 tmp.lammpstrj
+run		1500
+WARNING: No fixes defined, atoms won't move (../verlet.cpp:55)
+Neighbor list info ...
+  1 neighbor list requests
+  update every 1 steps, delay 0 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 2.8
+  ghost atom cutoff = 2.8
+  binsize = 1.4 -> bins = 15 75 2
+Memory usage per processor = 3.4676 Mbytes
+Step Temp E_pair E_mol TotEng Press 
+       0            7   -1.6076006            0    5.3890645    35.994435 
+    1000            7   -1.6076006            0    5.3890645    35.994435 
+    1500            7   -1.6076006            0    5.3890645    35.994435 
+Loop time of 0.987625 on 1 procs for 1500 steps with 2099 atoms
+
+Performance: 656119.397 tau/day, 1518.795 timesteps/s
+99.7% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.83725    | 0.83725    | 0.83725    |   0.0 | 84.77
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.0090334  | 0.0090334  | 0.0090334  |   0.0 |  0.91
+Output  | 0.10327    | 0.10327    | 0.10327    |   0.0 | 10.46
+Modify  | 0.001003   | 0.001003   | 0.001003   |   0.0 |  0.10
+Other   |            | 0.03707    |            |       |  3.75
+
+Nlocal:    2099 ave 2099 max 2099 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:    537 ave 537 max 537 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:    20145 ave 20145 max 20145 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 20145
+Ave neighs/atom = 9.59743
+Neighbor list builds = 0
+Dangerous builds = 0
+
+# dissolve the lattice
+
+fix		1 all nve
+fix		2 all enforce2d
+run		10000
+Memory usage per processor = 3.4676 Mbytes
+Step Temp E_pair E_mol TotEng Press 
+    1500            7   -1.6076006            0    5.3890645    35.994435 
+    2000    5.2775168   0.15430829            0    5.4293108    44.507168 
+    3000    5.4833369 -0.052780309            0    5.4279442    43.288153 
